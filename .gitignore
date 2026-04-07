@@ -1,0 +1,22 @@
+# Never push these
+.env
+__pycache__/
+*.py[cod]
+venv/
+env/
+
+# Generated outputs — too large for git
+output/screenshots/
+output/generated_tests/
+output/reports/
+
+# Keep folder structure
+!output/screenshots/.gitkeep
+!output/generated_tests/.gitkeep
+!output/reports/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
