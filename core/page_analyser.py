@@ -27,7 +27,11 @@ class PageAnalyser:
         print(f"\n[PageAnalyser] Analysing: {url}")
 
         with sync_playwright() as p:
+<<<<<<< HEAD
             browser = p.chromium.launch(headless=False)
+=======
+            browser = p.chromium.launch(headless=True)
+>>>>>>> c221bcef957e7aa598125f97e4af93d22424f819
             context = browser.new_context(
                 viewport={"width": 1280, "height": 720}
             )
@@ -100,6 +104,7 @@ class PageAnalyser:
 
         # ── Forms ─────────────────────────────────────────────────────────────
         elements["forms"] = page.evaluate("""
+<<<<<<< HEAD
         () => {
             return Array.from(document.querySelectorAll("form")).map(f => ({
                 action: f.action || "",
@@ -108,6 +113,16 @@ class PageAnalyser:
                 name: f.name || ""
             }));
         }
+=======
+            () => Array.from(document.querySelectorAll('form')).map((form, i) => ({
+                id:     form.id     || f'form_{i}',
+                action: form.action || '',
+                method: form.method || 'get',
+                fields: Array.from(form.querySelectorAll('input, textarea, select'))
+                    .map(f => f.name || f.id || f.placeholder || f.type)
+                    .filter(Boolean)
+            }))
+>>>>>>> c221bcef957e7aa598125f97e4af93d22424f819
         """)
 
         # ── Tables ────────────────────────────────────────────────────────────

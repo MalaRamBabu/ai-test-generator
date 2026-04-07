@@ -12,9 +12,9 @@ class GeminiTestGenerator:
     """
 
     API_URL = (
-    "https://generativelanguage.googleapis.com"
-    "/v1beta/models/gemini-2.5-flash:generateContent"
-)
+        "https://generativelanguage.googleapis.com"
+        "/v1beta/models/gemini-2.5-flash:generateContent"
+    )
 
     def __init__(self):
         self.api_key = os.environ.get("GEMINI_API_KEY")
@@ -25,12 +25,7 @@ class GeminiTestGenerator:
                 "Mac/Linux: export GEMINI_API_KEY=your_key"
             )
 
-
     def generate_tests(self, page_analysis):
-        """
-        Takes page analysis dict and returns
-        generated Playwright test code as a string.
-        """
         url       = page_analysis["url"]
         title     = page_analysis["title"]
         elements  = page_analysis["elements"]
@@ -45,8 +40,6 @@ class GeminiTestGenerator:
         return code
 
     def _build_prompt(self, url, title, elements):
-        """Build a detailed prompt for Gemini to generate test cases"""
-
         inputs      = elements.get("inputs",      [])
         buttons     = elements.get("buttons",     [])
         links       = elements.get("links",       [])
@@ -73,31 +66,14 @@ ELEMENTS FOUND ON PAGE:
 
 INSTRUCTIONS:
 Generate a complete Python file with Playwright test cases using PyTest.
-Follow these rules STRICTLY:
 
-1. Use Page Object Model — create a simple PageObject class at the top
-2. Each test must have a clear docstring explaining what it tests
-3. Cover these scenario types:
-   - Page load and title verification
-   - Navigation tests (if nav links found)
-   - Form validation — empty fields, invalid inputs
-   - Form submission flows
-   - Button click tests
-   - Table data validation (if tables found)
-   - File upload tests (if file inputs found)
-   - Positive and negative test cases
-4. Use pytest fixtures — page fixture using Playwright sync API
-5. Add clear comments in code
-6. Use data-qa attributes OR fallback to CSS selectors
-7. Handle page load waits properly
-8. Generate minimum 10 test cases maximum 15 test cases
+1. Use Page Object Model
+2. Add clear test cases (10–15)
+3. Cover positive & negative scenarios
+4. Use pytest fixtures
+5. Return ONLY Python code
 
-OUTPUT FORMAT — Return ONLY Python code, no explanation, no markdown, no backticks:
-
-import pytest
-from playwright.sync_api import sync_playwright
-
-# (rest of the code)
+OUTPUT:
 """
 
     def _call_gemini(self, prompt):
@@ -118,15 +94,12 @@ from playwright.sync_api import sync_playwright
             response.raise_for_status()
 
         data = response.json()
-
         return data["candidates"][0]["content"]["parts"][0]["text"]
 
     def _clean_code(self, code):
-        """Remove markdown code blocks if Gemini added them"""
         code = re.sub(r"```python\s*", "", code)
-        code = re.sub(r"```\s*",       "", code)
+        code = re.sub(r"```\s*", "", code)
         return code.strip()
 
     def _count_tests(self, code):
-        """Count number of test functions generated"""
         return len(re.findall(r"def test_", code))
